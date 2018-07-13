@@ -12,7 +12,7 @@ while True:
     response = requests.get(url).json()
     for module in response['items']:
         modulemd = yaml.safe_load(module['modulemd'])
-        dependencies = modulemd['dependencies']
+        dependencies = modulemd['data']['dependencies']
         module_br = set()
         module_req = set()
         for dependency in dependencies:
@@ -22,12 +22,12 @@ while True:
         overlap_req = set(blacklist_req).intersection(set(module_req))
         if overlap_br:
             modules.append(module)
-            raise RuntimeError('The module {0} with the ID {1} has a buildrequires dependency on {2}').format(
-                module['name'], module['id'], ', '.join(str(x) for x in overlap_br))
+            print('The module {0} with the ID {1} has a buildrequires dependency on {2}'.format(
+                module['name'], module['id'], ', '.join(str(x) for x in overlap_br)))
         if overlap_req:
             modules.append(module)
-            raise RuntimeError('The module {0} with the ID {1} has a requires dependency on {2}').format(
-                module['name'], module['id'], ', '.join(str(x) for x in overlap_br))
+            print('The module {0} with the ID {1} has a requires dependency on {2}'.format(
+                module['name'], module['id'], ', '.join(str(x) for x in overlap_req)))
     if response['meta']['next']:
         url = response['meta']['next']
     else:
