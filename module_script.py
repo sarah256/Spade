@@ -26,15 +26,18 @@ while True:
             mmd.upgrade()
         except Exception:
             raise ValueError('Invalid modulemd')
-        mmd = json.loads(mmd)
-        dependencies = mmd['data'].props.dependencies
+        mmd_file = mmd.dumps()
+        mmd = yaml.load(mmd_file)
+        dependencies = mmd['data']['dependencies']
         module_br = set()
         module_req = set()
         for dependency in dependencies:
-            module_br = module_br.union(set(dependency.get_buildrequires().keys()))
-            module_req = module_req.union(set(dependency.get_requires().keys()))
-        overlap_br = set(blacklist_br).intersection(set(module_br))
-        overlap_req = set(blacklist_req).intersection(set(module_req))
+            if 'buildrequires' in dependency.keys():
+                module_br = module_br.union(set(dependency['buildrequires']))
+                overlap_br = set(blacklist_br).intersection(set(module_br))
+            if 'requires' in dependency.keys():
+                module_req = module_req.union(set(dependency['requires']))
+                overlap_req = set(blacklist_req).intersection(set(module_req))
         if overlap_br:
             modules.append(module)
             print('\nThe module {0} with the ID {1} has a buildrequires dependency on {2}\n'.format(
