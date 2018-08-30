@@ -1,5 +1,15 @@
 ---
 requires:
-- python3
+- go-toolset-1.10
+- go
+- llvm-toolset-6.0
+- llvm
+- rust-toolset-1.26
+- rust
 buildrequires:
-- python3
+- go-toolset-1.10
+- go
+- llvm-toolset-6.0
+- llvm
+- rust-toolset-1.26
+- rust
