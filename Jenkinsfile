@@ -2,13 +2,6 @@ try { // massive try{} catch{} around the entire build for failure notifications
     timestamps {
         timeout(time: 60, unit: 'MINUTES') {
             node('fedora-28') {
-                def namespace=sh(returnStdout: true, script: """python -c 'import os, json; print(json.loads(os.environ["CI_MESSAGE"])["namespace"])'""").trim()
-                if(namespace != 'modules') {
-                    echo "Not a change to the module namespace, skipping.."
-                    echo "dist-git commit message: $CI_MESSAGE"
-                    currentBuild.result = 'NOT_BUILT'
-                    return
-                }
                 cleanWs()
 
                 stage('Prepare ENV') {
@@ -20,16 +13,21 @@ try { // massive try{} catch{} around the entire build for failure notifications
                              http://download.devel.redhat.com/rel-eng/RCMTOOLS/rcm-tools-fedora.repo
 
                         sudo dnf -y install git krb5-workstation python2 python2-pip \
-                             python-gobject libmodulemd python2-pygit2
+                             python-gobject libmodulemd python2-pygit2 python2-yamlordereddictloader
 
-                        git clone https://github.com/yashvardhannanavati/Spade.git
+                        git clone -b spade_jenkinsfile https://github.com/yashvardhannanavati/Spade.git
                     """
                 } // prepare env stage
 
                 stage('Run Spade'){
-                        sh '''#!/bin/bash
-                        echo 'Hello World!'
-                        '''
+                    sh '''#!/bin/bash
+                    if [ -n "$MESSAGE_ID" ] ; then
+                        export CI_MESSAGE=$(curl "https://datagrepper.engineering.redhat.com/id?id=$MESSAGE_ID")
+                    fi
+                    cd Spade
+                    python spade.py > log.txt
+                    cat log.txt
+                    '''
                 } // run spade
             } // node
         } // timeout
@@ -42,4 +40,13 @@ try { // massive try{} catch{} around the entire build for failure notifications
              body: "${env.BUILD_URL}\n\n${e}"
     }
     throw e
+} finally {
+    def currentResult = currentBuild.result ?: 'SUCCESS'
+    def script_result = '${BUILD_LOG_REGEX, regex="^The module", maxMatches=5, showTruncatedLines=false, escapeHtml=true}'
+
+    if (currentResult == 'SUCCESS' && script_result?.empty){
+        emailext to: "yashn@redhat.com",
+                 subject: "[factory2-spade] Module dependency overlap",
+                 body: script_result
+    }
 }
