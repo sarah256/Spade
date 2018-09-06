@@ -71,7 +71,6 @@ def main(args=None):
     filenames = msg["stats"]["files"]
     if not filenames:
         log.info("No files were changed! Skipping...")
-        exit(1)
 
     for filename in filenames.keys():
         if filename.endswith(".yaml"):

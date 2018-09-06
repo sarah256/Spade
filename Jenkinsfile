@@ -25,7 +25,7 @@ try { // massive try{} catch{} around the entire build for failure notifications
                         export CI_MESSAGE=$(curl "https://datagrepper.engineering.redhat.com/id?id=$MESSAGE_ID")
                     fi
                     cd Spade
-                    python spade.py
+                    python spade.py -v
                     '''
                 } // run spade
             } // node

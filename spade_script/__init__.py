@@ -44,5 +44,4 @@ def validate_modulemd(modulemd_file, module_name):
         print('\nThe module {0} has a requires dependency on {1}\n'.format(
             module_name, ', '.join(str(x) for x in overlap_req)), file=sys.stderr)
     if not overlap_br and not overlap_req:
-        log.info('No Overlap Found')
-        exit(1)
+        print('\nNo Overlap found for {0}\n'.format(module_name), file=sys.stderr)
