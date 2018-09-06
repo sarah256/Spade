@@ -15,7 +15,7 @@ try { // massive try{} catch{} around the entire build for failure notifications
                         sudo dnf -y install git krb5-workstation python2 python2-pip \
                              python-gobject libmodulemd python2-pygit2 python2-yamlordereddictloader
 
-                        git clone https://github.com/yashvardhannanavati/Spade.git
+                        git clone https://github.com/release-engineering/Spade.git
                     """
                 } // prepare env stage
 
