@@ -4,9 +4,7 @@ A Python script that identifies any modules that depend on other modules by pars
 
 To install the necessary packages, run:
 ```bash
-sudo dnf install python-gobject
-
-sudo dnf install libmodulemd
+sudo dnf -y install python-gobject libmodulemd python2-pygit2 python2-yamlordereddictloader
 ```
 
 To choose what dependencies would warrant a blacklist on a particular module, populate the blacklist.yaml file with the appropriate requires and buildrequires dependencies.
