@@ -30,6 +30,8 @@ def validate_modulemd(modulemd_file, module_name):
     dependencies = mmd['data']['dependencies']
     module_br = set()
     module_req = set()
+    overlap_br = None
+    overlap_req = None
     for dependency in dependencies:
         if 'buildrequires' in dependency.keys():
             module_br = module_br.union(set(dependency['buildrequires']))
