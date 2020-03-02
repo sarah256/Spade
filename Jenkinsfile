@@ -12,8 +12,8 @@ try { // massive try{} catch{} around the entire build for failure notifications
                         sudo curl -o /etc/yum.repos.d/rcm-tools-fedora.repo \
                              http://download.devel.redhat.com/rel-eng/RCMTOOLS/rcm-tools-fedora.repo
 
-                        sudo dnf -y install git krb5-workstation python2 python2-pip \
-                             python-gobject libmodulemd python2-pygit2 python2-yamlordereddictloader
+                        sudo dnf -y install git krb5-workstation python3 python3-pip \
+                             python3-gobject libmodulemd python3-pygit2 python3-yamlordereddictloader
 
                         git clone https://github.com/release-engineering/Spade.git
                     """
@@ -25,7 +25,7 @@ try { // massive try{} catch{} around the entire build for failure notifications
                         export CI_MESSAGE=$(curl "https://datagrepper.engineering.redhat.com/id?id=$MESSAGE_ID")
                     fi
                     cd Spade
-                    python spade.py -v
+                    python3 spade.py -v
                     '''
                 } // run spade
             } // node
