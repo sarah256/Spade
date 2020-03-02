@@ -5,7 +5,7 @@ import sys
 import logging
 
 import gi
-gi.require_version('Modulemd', '1.0')  # noqa
+gi.require_version('Modulemd', '2.0')  # noqa
 from gi.repository import Modulemd  # noqa
 
 log = logging.getLogger('validate_modulemd')
@@ -21,29 +21,29 @@ def validate_modulemd(modulemd_file, module_name):
     blacklist_br = set(blacklist.get('buildrequires', []))
     modulemd = json.dumps(modulemd)
     try:
-        mmd = Modulemd.Module().new_from_string(modulemd)
-        mmd.upgrade()
+        mmd = Modulemd.ModuleStream.read_string(modulemd, True)
+        mmd.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
     except Exception:
         raise ValueError('Invalid modulemd')
-    mmd_file = mmd.dumps()
-    mmd = yaml.load(mmd_file)
-    dependencies = mmd['data']['dependencies']
+    dependencies = mmd.get_dependencies()
+
     module_br = set()
     module_req = set()
     overlap_br = None
     overlap_req = None
     for dependency in dependencies:
-        if 'buildrequires' in dependency.keys():
-            module_br = module_br.union(set(dependency['buildrequires']))
-            overlap_br = set(blacklist_br).intersection(set(module_br))
-        if 'requires' in dependency.keys():
-            module_req = module_req.union(set(dependency['requires']))
-            overlap_req = set(blacklist_req).intersection(set(module_req))
+        # Find if any buildtime dependencies are blacklisted
+        module_br = module_br.union(set(dependency.get_buildtime_modules()))
+        overlap_br = set(blacklist_br).intersection(set(module_br))
+        # Find if any runtime dependencies are blacklisted
+        module_req = module_req.union(set(dependency.get_runtime_modules()))
+        overlap_req = set(blacklist_req).intersection(set(module_req))
+
     if overlap_br:
-        print('\nThe module {0} has a buildrequires dependency on {1}\n'.format(
+        print('\nThe module {0} has a build-time dependency on {1}\n'.format(
             module_name, ', '.join(str(x) for x in overlap_br)), file=sys.stderr)
     if overlap_req:
-        print('\nThe module {0} has a requires dependency on {1}\n'.format(
+        print('\nThe module {0} has a runtime dependency on {1}\n'.format(
             module_name, ', '.join(str(x) for x in overlap_req)), file=sys.stderr)
     if not overlap_br and not overlap_req:
         print('\nNo Overlap found for {0}\n'.format(module_name), file=sys.stderr)
