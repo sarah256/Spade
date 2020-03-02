@@ -81,7 +81,7 @@ def main(args=None):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Release Driver')
+    parser = argparse.ArgumentParser(description='Spade')
     parser.add_argument('-d', '--debug', default=False, action='store_true',
                         help='Show debug information')
     parser.add_argument('-v', '--verbose', default=False, action='store_true',
